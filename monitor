@@ -1,6 +1,6 @@
 #!/bin/bash
 service=$1
-ip=$(curl -s https://api.ipify.org)
+ip=$(ip route get 8.8.8.8 | awk '/src/ {f=NR} f&&NR-1==f' RS=" ")
 os="$(neofetch os)"; os="${os##*: }"
 distro="$(neofetch distro)"; distro="${distro##*: }"
 cpu="$(neofetch cpu --cpu_speed on --cpu_cores off)"; cpu="${cpu##*: }"
@@ -122,9 +122,11 @@ udphysteria=$(systemctl is-active hysteria-server.service)
 squid=$(systemctl is-active squid)
 ssl=$(systemctl is-active stunnel4)
 socket=$((echo >/dev/tcp/localhost/80) &>/dev/null && echo "active" || echo "inactive")
-totalocserv=$(echo $(occtl -j -n  show users) | jq ". | length")
+#totalocserv=$(echo $(occtl -j -n  show users) | jq ". | length")
+totalocserv=$(netstat -natp | awk "/$ip:1194/ && /ESTABLISHED/ && /ocserv/" | wc -l)
 total_hysteria=$(netstat -natp | awk "/$ip:53/ && /ESTABLISHED/ && /hysteria/" | wc -l)
 . /root/.ports
+. /root/.db-base
 
 output=$(cat <<EOF
 {
@@ -148,7 +150,7 @@ output=$(cat <<EOF
 EOF
 )
 
-mysql -u $USER -p$PASS -D $DB -h $HOST -e "UPDATE server_list SET cpu_model='$cpu', distro='$distro', memory='$memory', uptime='$uptime', disk='$disk', bandwidth='$bandwidth', os='$os', proto='$service', tcpssl='$tcp_ssl_port', udpssl='$udp_ssl_port', tcp_status='$tcpovpn', hysteria_status='$udphysteria', udp_status='$udpovpn', ssl_status='$ssl', squid_status='$squid', socket_status='$socket', tcp='$tcp_port', udp='$udp_port', hysteria_port='$hysteria_port', squid='$squid_port', socket='$socket_port', online='$totalocserv', hysteria_online='$total_hysteria' WHERE server_ip='$ip' "
+mysql -u $DB_USER -p$DB_PASS -D $DB_NAME -h $DB_HOST -e "UPDATE server_list SET cpu_model='$cpu', distro='$distro', memory='$memory', uptime='$uptime', disk='$disk', bandwidth='$bandwidth', os='$os', proto='$service', tcpssl='$tcp_ssl_port', udpssl='$udp_ssl_port', tcp_status='$ocserv', hysteria_status='$udphysteria', udp_status='$ocserv', ssl_status='$ssl', squid_status='$squid', socket_status='$socket', tcp='$tcp_port', udp='$udp_port', hysteria_port='$hysteria_port', squid='$squid_port', socket='$socket_port', online='$totalocserv', hysteria_online='$total_hysteria' WHERE server_ip='$ip' "
 
 elif [[ $service == "xray" ]];
 then
