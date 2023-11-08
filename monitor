@@ -60,7 +60,7 @@ udpusers=$(sed -n -e '/^ROUTING_TABLE/p' /etc/openvpn/server/udpclient.log | wc 
 totalovpn=$((tcpusers + udpusers))
 total_hysteria=$(netstat -natp | awk "/$ip:53/ && /ESTABLISHED/ && /hysteria/" | wc -l)
 . /root/.ports
-. /etc/openvpn/login/config2.sh
+. /etc/openvpn/login/config.sh
 
 output=$(cat <<EOF
 {
