@@ -1,4 +1,3 @@
-#!/bin/bash
 service=$1
 ip=$(curl -s https://api.ipify.org)
 os="$(neofetch os)"; os="${os##*: }"
