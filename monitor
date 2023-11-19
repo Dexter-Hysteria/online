@@ -7,7 +7,7 @@ cpu="$(neofetch cpu --cpu_speed on --cpu_cores off)"; cpu="${cpu##*: }"
 memory="$(neofetch memory)"; memory="${memory##*: }"
 disk="$(neofetch disk)"; disk="${disk##*: }"
 uptime="$(neofetch uptime)"; uptime="${uptime##*: }"
-bandwidth=$(vnstat --online | cut -d ";" -f 15)
+bandwidth=$(vnstat --oneline | cut -d ";" -f 15)
 
 if [[ $service == "ssh" ]];
 then
