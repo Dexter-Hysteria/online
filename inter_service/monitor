@@ -1,6 +1,6 @@
 #!/bin/bash
 service=$1
-ip=$(curl -s https://api.ipify.org)
+ip=$(curl -s ipinfo.io/ip)
 os="$(neofetch os)"; os="${os##*: }"
 distro="$(neofetch distro)"; distro="${distro##*: }"
 cpu="$(neofetch cpu --cpu_speed on --cpu_cores off)"; cpu="${cpu##*: }"
