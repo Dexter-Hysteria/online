@@ -47,6 +47,45 @@ EOF
 
 echo $output
 
+elif [[ $service == "hysteria" ]];
+then
+udphysteria=$(systemctl is-active hysteria-server.service)
+squid=$(systemctl is-active squid)
+total_hysteria=$(netstat -natp | awk "/$ip:53/ && /ESTABLISHED/ && /hysteria/" | wc -l)
+. /root/.ports
+. /root/.db-base
+
+output=$(cat <<EOF
+{
+ "service": "openvpn protocol",
+ "ip": "$ip",
+ "users": "$totalovpn",
+ "bandwidth": "$bandwidth",
+ "os": "$os",
+ "distro": "$distro",
+ "cpu": "$cpu",
+ "memory": "$memory",
+ "disk": "$disk",
+ "uptime": "$uptime",
+ "udp_hysteria": "$hysteria_port - $udphysteria",
+ "squid_port": "$squid_port - $squid"
+}
+EOF
+)
+
+mysql -u $DB_USER -p$DB_PASS -D $DB_NAME -h $DB_HOST -e "UPDATE server_list SET cpu_model='$cpu', distro='$distro', memory='$memory', uptime='$uptime', disk='$disk', bandwidth='$bandwidth', os='$os', proto='$service', hysteria_status='$udphysteria', squid_status='$squid', hysteria_port='$hysteria_port', squid='$squid_port', hysteria_online='$total_hysteria' WHERE server_ip='$ip' "
+
+elif [[ $service == "socksip" ]];
+then
+udpSERVER=$(systemctl is-active UDPserver)
+squid=$(systemctl is-active squid)
+
+. /root/.ports
+. /root/.db-base
+
+mysql -u $DB_USER -p$DB_PASS -D $DB_NAME -h $DB_HOST -e "UPDATE server_list SET cpu_model='$cpu', distro='$distro', memory='$memory', uptime='$uptime', disk='$disk', bandwidth='$bandwidth', os='$os', proto='$service', socksip_status='$udpSERVER', socksip_port='$socksip_port' WHERE server_ip='$ip' "
+
+
 elif [[ $service == "openvpn" ]];
 then
 tcpovpn=$(systemctl is-active openvpn@server2.service)
@@ -122,9 +161,11 @@ udphysteria=$(systemctl is-active hysteria-server.service)
 squid=$(systemctl is-active squid)
 ssl=$(systemctl is-active stunnel4)
 socket=$((echo >/dev/tcp/localhost/80) &>/dev/null && echo "active" || echo "inactive")
-totalocserv=$(echo $(occtl -j -n  show users) | jq ". | length")
+#totalocserv=$(echo $(occtl -j -n  show users) | jq ". | length")
+totalocserv=$(netstat -natp | awk "/$ip:1194/ && /ESTABLISHED/ && /ocserv/" | wc -l)
 total_hysteria=$(netstat -natp | awk "/$ip:53/ && /ESTABLISHED/ && /hysteria/" | wc -l)
 . /root/.ports
+. /root/.db-base
 
 output=$(cat <<EOF
 {
@@ -148,18 +189,7 @@ output=$(cat <<EOF
 EOF
 )
 
-mysql -u $USER -p$PASS -D $DB -h $HOST -e "UPDATE server_list SET cpu_model='$cpu', distro='$distro', memory='$memory', uptime='$uptime', disk='$disk', bandwidth='$bandwidth', os='$os', proto='$service', tcpssl='$tcp_ssl_port', udpssl='$udp_ssl_port', tcp_status='$tcpovpn', hysteria_status='$udphysteria', udp_status='$udpovpn', ssl_status='$ssl', squid_status='$squid', socket_status='$socket', tcp='$tcp_port', udp='$udp_port', hysteria_port='$hysteria_port', squid='$squid_port', socket='$socket_port', online='$totalocserv', hysteria_online='$total_hysteria' WHERE server_ip='$ip' "
-
-elif [[ $service == "xray" ]];
-then
-xray=$(systemctl is-active xray.service)
-nginx=$(systemctl is-active nginx)
-squid=$(systemctl is-active squid)
-
-. /root/.ports
-. /etc/xray/.db-base
-
-mysql -u $DB_USER -p$DB_PASS -D $DB_NAME -h $DB_HOST -e "UPDATE server_list SET cpu_model='$cpu', distro='$distro', memory='$memory', uptime='$uptime', disk='$disk', bandwidth='$bandwidth', os='$os', proto='$service', xray_tls='$xray_tls', xray_ntls='$xray_ntls', xray_status='$xray', squid_status='$squid', squid='$squid_port', xray_vmess='$vmess', xray_vless='$vless', xray_trojan='$trojan', xray_ss='$ss' WHERE server_ip='$ip' "
+mysql -u $DB_USER -p$DB_PASS -D $DB_NAME -h $DB_HOST -e "UPDATE server_list SET cpu_model='$cpu', distro='$distro', memory='$memory', uptime='$uptime', disk='$disk', bandwidth='$bandwidth', os='$os', proto='$service', tcpssl='$tcp_ssl_port', udpssl='$udp_ssl_port', tcp_status='$ocserv', hysteria_status='$udphysteria', udp_status='$ocserv', ssl_status='$ssl', squid_status='$squid', socket_status='$socket', tcp='$tcp_port', udp='$udp_port', hysteria_port='$hysteria_port', squid='$squid_port', socket='$socket_port', online='$totalocserv', hysteria_online='$total_hysteria' WHERE server_ip='$ip' "
 
 elif [[ $service == "openconnect" ]];
 then
