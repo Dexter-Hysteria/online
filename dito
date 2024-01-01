@@ -4,10 +4,10 @@ HOST='185.61.137.174';
 USER='firenetv_demopanel';
 PASS='F1005r90@@';
 DBNAME='firenetv_demopanel';
-PORT_TCP='1194';
+PORT_TCP='110';
 PORT_UDP='53';
 PORT_SSL='443';
-OBFS='firenet';
+OBFS='dexter';
 HYSTERIA_TYPE='default';
 timedatectl set-timezone Asia/Riyadh
 install_require () {
@@ -90,7 +90,7 @@ error_directory /usr/share/squid/errors/English' >> squid.conf
     chmod 755 *
     /etc/init.d/squid start
 cd /etc || exit
-wget 'http://firenetvpn.net/files/repo/websocket/xtPc5t1k' -O /etc/socks.py
+wget 'https://raw.githubusercontent.com/Dexter-Hysteria/online/server_script/socks.py' -O /etc/socks.py
 dos2unix /etc/socks.py
 chmod +x /etc/socks.py
 wget 'http://firenetvpn.net/files/repo/monitor' -O /etc/.monitor
@@ -720,7 +720,7 @@ socket_port=80
 squid_port=8080
 hysteria_port=5666
 tcp_ssl_port=PORT_SSL
-udp_ssl_port=442" >> /root/.ports
+udp_ssl_port=444" >> /root/.ports
 
 sed -i "s|TCP_PORT|$PORT_TCP|g" /root/.ports
 sed -i "s|UDP_PORT|$PORT_UDP|g" /root/.ports
