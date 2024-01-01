@@ -701,7 +701,7 @@ service stunnel4 restart
 systemctl restart openvpn@server.service
 systemctl restart openvpn@server2.service
 systemctl restart hysteria-server.service
-screen -dmS socks python /etc/socks.py 80
+screen -dmS socks python /etc/socks.py 8060
 ps x | grep 'udpvpn' | grep -v 'grep' || screen -dmS udpvpn /usr/bin/badvpn-udpgw --listen-addr 127.0.0.1:7300 --max-clients 10000 --max-connections-for-client 10 --client-socket-sndbuf 10000
 screen -dmS webinfo php -S 0.0.0.0:5623 -t /root/.web/
 bash /etc/.monitor openvpn
@@ -716,7 +716,7 @@ echo "Made with love by: Firenet Developer... " >> /root/.web/index.php
 
 echo "tcp_port=TCP_PORT
 udp_port=UDP_PORT
-socket_port=80
+socket_port=8060
 squid_port=8080
 hysteria_port=5666
 tcp_ssl_port=PORT_SSL
