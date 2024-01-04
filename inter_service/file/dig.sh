@@ -1,5 +1,5 @@
 #!/bin/bash
-. /root/.dns/config
+. /etc/.dns/config
 ## Script to keep-alive your DNSTT server domain record query from target resolver/local dns server
 
 ## Your DNSTT Nameserver & your Domain A Record
